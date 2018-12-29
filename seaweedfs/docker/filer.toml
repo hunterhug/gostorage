@@ -1,17 +1,4 @@
-[mysql]
-# ./weed.exe scaffold filer
-# CREATE TABLE IF NOT EXISTS filemeta (
-#   dirhash     BIGINT        COMMENT 'first 64 bits of MD5 hash value of directory field',
-#   name        VARCHAR(1000) COMMENT 'directory or file name',
-#   directory   VARCHAR(4096) COMMENT 'full path to parent directory',
-#   meta        BLOB,
-#   PRIMARY KEY (dirhash, name)
-# ) DEFAULT CHARSET=utf8;
+[leveldb]
+# local on disk, mostly for simple single-machine setup, fairly scalable
 enabled = true
-hostname = "192.168.0.101"
-port = 3306
-username = "root"
-password = "123456"
-database = "seafile"              # create or use an existing database
-connection_max_idle = 2
-connection_max_open = 100
+dir = "/leveldb"                                       # directory to store level db files

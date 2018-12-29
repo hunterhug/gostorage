@@ -5,52 +5,62 @@ services:
     container_name: "seaweed_master"
     restart: always
     image: seaweed:latest
-    #image: chrislusf/seaweedfs # use a remote image
-    #    build: . # build our container from the local Dockerfile
     ports:
-    - 39333:9333
-    command: 'master -mdir="/master"'
+      - 39333:9333
+    command: 'master'
     networks:
       default:
         aliases:
-        - seaweed_master
+          - seaweed_master
     volumes:
-    - /storage/app/seaweed/master:/data
-  weedvolume:
-    container_name: "seaweed_volume"
+      - /storage/app/seaweed/master:/data
+  weedvolume1:
+    container_name: "seaweed_volume1"
     restart: always
     image: seaweed:latest
-    #image: chrislusf/seaweedfs # use a remote image
-    #    build: . # build our container from the local Dockerfile
-    ports:
-    - 38080:8080
+    #ports:
+    #- 38080:8080
     #    - 18080:18080
-    command: 'volume -max=20 -mserver="weedmaster:9333" -port=8080 -dir="/data1"'
+    command: 'volume -max=20 -mserver="seaweed_master:9333" -port=8080'
     depends_on:
-    - weedmaster
+      - weedmaster
     networks:
       default:
         aliases:
-        - seaweed_volume
+          - seaweed_volume1
     volumes:
-    - /storage/app/seaweed/v1:/data
+      - /storage/app/seaweed/volume1:/data
+  weedvolume2:
+    container_name: "seaweed_volume2"
+    restart: always
+    image: seaweed:latest
+    #ports:
+    #  - 38080:8080
+    #    - 18080:18080
+    command: 'volume -max=20 -mserver="seaweed_master:9333" -port=8080'
+    depends_on:
+      - weedmaster
+    networks:
+      default:
+        aliases:
+          - seaweed_volume2
+    volumes:
+      - /storage/app/seaweed/volume2:/data
   filer:
     container_name: "seaweed_filer"
     restart: always
     image: seaweed:latest
-    #image: chrislusf/seaweedfs # use a remote image
-    #    build: . # build our container from the local Dockerfile
     ports:
-    - 38888:8888
+      - 38888:8888
     #    - 18888:18888
-    command: 'filer -master="weedmaster:9333"'
+    command: 'filer -master="seaweed_master:9333" -port=8888'
     depends_on:
-    - weedmaster
-    - weedvolume
+      - weedmaster
+      - weedvolume1
+      - weedvolume2
     networks:
       default:
         aliases:
-        - seaweed_filer
-
+          - seaweed_filer
     volumes:
-      - /storage/app/seaweed/config:/etc/seaweedfs
+      - /storage/app/seaweed/filer:/leveldb

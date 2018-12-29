@@ -1,70 +1,44 @@
-# 部署服务
+# 网络文件服务部署
 
-https://github.com/chrislusf/seaweedfs/wiki
 
 ## 制作镜像
 
 ```
-cd docker
-docker build -t seaweed:latest .
-docker tag seaweed:latest 192.168.0.101:8888/public/seaweed:latest
-docker push  192.168.0.101:8888/public/seaweed:latest
+sudo ./docker_build.sh
 ```
 
-启动前准备:
+## 启动
 
 ```
-mkdir /storage/app/seaweed
-mkdir /storage/app/seaweed/master
-mkdir /storage/app/seaweed/v1
-mkdir /storage/app/seaweed/config
-
-vim /storage/app/seaweed/config/filer.toml
-
-[mysql]
-# ./weed.exe scaffold filer
-enabled = true
-hostname = "192.168.0.101"
-port = 3306
-username = "root"
-password = "123456"
-database = "seafile"              # create or use an existing database
-connection_max_idle = 2
-connection_max_open = 100
+sudo ./install.sh
 ```
 
-请建数据库:
+## 测试
+
+上传文件:
 
 ```
-sudo docker exec -it zendaomysql mysql -uroot -P13306 -p
-
-create database voicefile default character set utf8mb4 collate utf8mb4_unicode_ci;
-use voicefile;
-CREATE TABLE IF NOT EXISTS filemeta (
-dirhash     BIGINT        COMMENT 'first 64 bits of MD5 hash value of directory field',
-name        VARCHAR(1000) COMMENT 'directory or file name',
-directory   VARCHAR(4096) COMMENT 'full path to parent directory',
-meta        BLOB,
-PRIMARY KEY (dirhash, name)
-) DEFAULT CHARSET=utf8;
-```
-
-启动
-```
-docker-compose up -d
-```
-
-测试：
-
-```
-# Basic Usage:
-> curl -F file=@report.js "http://192.168.0.101:38888/javascript/"
+> curl -F file=@report.js "http://127.0.0.1:38888/javascript/"
 {"name":"report.js","size":866,"fid":"7,0254f1f3fd","url":"http://localhost:8081/7,0254f1f3fd"}
-> curl  "http://192.168.0.101:38888/javascript/report.js"   # get the file content
-...
-> curl -F file=@report.js "http://192.168.0.101:38888/javascript/new_name.js"    # upload the file with a different name
+```
+
+获取文件内容:
+
+```
+> curl  "http://127.0.0.1:38888/javascript/report.js"   # get the file content
+```
+
+上传文件使用不一样的名字:
+
+```
+> curl -F file=@report.js "http://127.0.0.1:38888/javascript/new_name.js"    # upload the file with a different name
 {"name":"report.js","size":866,"fid":"3,034389657e","url":"http://localhost:8081/3,034389657e"}
-> curl  -H "Accept: application/json" "http://192.168.0.101:38888/javascript/?pretty=y"            # list all files under /javascript/
+```
+
+获取文件夹下文件:
+
+```
+> curl -H "Accept: application/json" "http://127.0.0.1:38888/javascript/?pretty=y"   # list all files under /javascript/
 {
   "Directory": "/javascript/",
   "Files": [
@@ -79,9 +53,12 @@ docker-compose up -d
   ],
   "Subdirectories": null
 }
+```
 
+翻页:
 
-curl  -H "Accept: application/json" "http://192.168.0.101:38888/javascript/?pretty=y&lastFileName=new_name.js&limit=2"
+```
+> curl  -H "Accept: application/json" "http://127.0.0.1:38888/javascript/?pretty=y&lastFileName=new_name.js&limit=2"
 {
   "Directory": "/javascript/",
   "Files": [
@@ -91,13 +68,14 @@ curl  -H "Accept: application/json" "http://192.168.0.101:38888/javascript/?pret
     }
   ]
 }
-
-
-curl -X DELETE "http://192.168.0.101:38888/assets/report.js"
 ```
 
-可打开:
+删除文件:
 
-http://192.168.0.101:39333/
+```
+> curl -X DELETE "http://127.0.0.1:38888/javascript/report.js"
+```
 
-http://192.168.0.101:38888
+网络文件服务查看: http://127.0.0.1:39333
+
+文件Filer界面: http://127.0.0.1:38888
