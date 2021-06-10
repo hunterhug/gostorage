@@ -23,9 +23,9 @@ type FileList struct {
 }
 
 type FileInfo struct {
-	Id       string                   // 文件ID
-	Size     int                      // 文件大小,Byte
-	IsDir    bool                     // 是否是目录
+	Id       string // 文件ID
+	Size     int    // 文件大小,Byte
+	IsDir    bool   // 是否是目录
 	FullPath string `json:"FullPath"` // 文件路口
 	Mtime    string `json:"Mtime"`    // 修改时间
 	Crtime   string `json:"Crtime"`   // 创建时间
@@ -105,7 +105,7 @@ func (c *FilerClient) GetDirInfo(dir string, lastFileName string, Limit int) (er
 
 	temp.SetHeaderParm("Accept", miner.HTTPJSONContentType)
 	data, err := temp.Get()
-	if c.w.UrlStatuscode == 404 {
+	if c.w.GetResponseStatusCode() == 404 {
 		exist = false
 		return
 	}
@@ -113,7 +113,7 @@ func (c *FilerClient) GetDirInfo(dir string, lastFileName string, Limit int) (er
 		return
 	}
 
-	file := c.w.Response.Header.Get("Content-Disposition")
+	file := c.w.Response.Response.Header.Get("Content-Disposition")
 	if strings.Contains(file, "inline") {
 		isDir = false
 		fileData = data

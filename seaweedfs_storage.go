@@ -1,11 +1,12 @@
-package seaweedfs
+package gostorage
 
 import (
 	"errors"
+	"github.com/hunterhug/gostorage/seaweedfs/core"
 	"github.com/hunterhug/marmot/miner"
+	"os"
 	"path"
 	"strings"
-	"github.com/hunterhug/gostorage/seaweedfs/core"
 )
 
 type SeaWeedFs struct {
@@ -14,9 +15,18 @@ type SeaWeedFs struct {
 	Debug      bool
 }
 
-func (o *SeaWeedFs) Init() error {
-	core.SetTimeOut(o.TimeOut)
-	if o.Debug {
+func NewSeaWeedFs(url string, timeOut int, debug bool) (Interface, error) {
+	s := new(SeaWeedFs)
+	s.Debug = debug
+	s.NetworkUrl = url
+	s.TimeOut = timeOut
+	err := s.Init()
+	return s, err
+}
+
+func (s *SeaWeedFs) Init() error {
+	core.SetTimeOut(s.TimeOut)
+	if s.Debug {
 		core.SetDebug()
 	}
 	return nil
@@ -26,7 +36,7 @@ func (*SeaWeedFs) CreateDir(name string) error {
 	return nil
 }
 
-func (s *SeaWeedFs) GetFileInfo(name string) (interface{}, error) {
+func (s *SeaWeedFs) GetFileInfo(name string) (os.FileInfo, error) {
 	return nil, nil
 
 }

@@ -1,23 +1,3 @@
-# File Store Lib
-
-```
-type Interface interface {
-	Init() error
-	CreateDir(name string) error
-	RemoveDir(name string, all bool) error
-	CreateFile(name string, data []byte) error
-	ReadFile(name string) ([]byte, error)
-	RemoveFile(name string) error
-	IsExist(name string) bool
-	IsDir(name string) bool
-	IsFile(name string) bool
-	GetFileInfo(name string) (os.FileInfo, error)
-}
-```
-
-## Example
-
-```
 package main
 
 import (
@@ -75,5 +55,3 @@ func main() {
 		return
 	}
 }
-```
-
